@@ -1,0 +1,54 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Security Group Stack
+
+Parameters:
+  ProjectPrefix:
+    Type: String
+    Default: cfnguard
+
+  NetworkStackNamePrefix:
+    Type: String
+    Default: network
+
+Resources:
+  ALBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub ${ProjectPrefix}-alb-sg
+      GroupDescription: !Sub ${ProjectPrefix}-alb-sg
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectPrefix}-alb-sg
+      VpcId:  
+        Fn::ImportValue: !Sub ${NetworkStackNamePrefix}-VpcId
+      SecurityGroupIngress:
+      - IpProtocol: "tcp"
+        FromPort: 443
+        ToPort: 443
+        CidrIp: "0.0.0.0/0"
+
+  WebSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub ${ProjectPrefix}-web-sg
+      GroupDescription: !Sub ${ProjectPrefix}-web-sg
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectPrefix}-web-sg
+      VpcId:  
+        Fn::ImportValue: !Sub ${NetworkStackNamePrefix}-VpcId
+      SecurityGroupIngress:
+      - IpProtocol: "tcp"
+        FromPort: 22
+        ToPort: 22
+        CidrIp: "0.0.0.0/0"
+
+  WebSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref WebSecurityGroup
+      IpProtocol: tcp
+      FromPort: 80
+      ToPort: 80
+      SourceSecurityGroupId: !Ref ALBSecurityGroup
