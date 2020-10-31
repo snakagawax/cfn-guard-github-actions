@@ -33,13 +33,13 @@ jobs:
         env: 
           TEMPLATE: network
         run: |
-          cfn-guard check --template ./templates/${TEMPLATE}.yml --rule_set ./cfn-guard-rules/${TEMPLATE}_ruleset
+          ./cfn-guard-linux/cfn-guard check --template ./templates/${TEMPLATE}.yml --rule_set ./cfn-guard-rules/${TEMPLATE}_ruleset
 
       - name: check security group template with CloudFormation Guard
         env: 
           TEMPLATE: sg
         run: |
-          cfn-guard check --template ./templates/${TEMPLATE}.yml --rule_set ./cfn-guard-rules/${TEMPLATE}_ruleset
+          ./cfn-guard-linux/cfn-guard check --template ./templates/${TEMPLATE}.yml --rule_set ./cfn-guard-rules/${TEMPLATE}_ruleset
 
       - name: Deploy network stack
         env:
