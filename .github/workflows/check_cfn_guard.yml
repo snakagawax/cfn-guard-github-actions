@@ -21,13 +21,13 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-1
-      
+
       - name: install CloudFormation Guard
         env: 
           CFN_GUARD_VERSION: 1.0.0
         run: |
           wget https://github.com/aws-cloudformation/cloudformation-guard/releases/download/${CFN_GUARD_VERSION}/cfn-guard-linux-${CFN_GUARD_VERSION}.tar.gz
-          tar -xvf cfn-guard-linux-1.0.0.tar.gz
+          tar -xvf cfn-guard-linux-${CFN_GUARD_VERSION}.tar.gz
 
       - name: check network template with CloudFormation Guard
         env: 
@@ -42,15 +42,19 @@ jobs:
           cfn-guard check --template ./templates/${TEMPLATE}.yml --rule_set ./cfn-guard-rules/${TEMPLATE}_ruleset
 
       - name: Deploy network stack
-        uses: aws-actions/aws-cloudformation-github-deploy@master
-        with:
-          name: network
-          template: templates/network.yml
-          no-fail-on-empty-changeset: "1"
+        env:
+          STACK_NAME: network
+        run: |
+          aws cloudformation deploy \
+            --stack-name ${STACK_NAME} \
+            --template-file ./templates/${STACK_NAME}.yml \
+            --no-fail-on-empty-changeset
 
       - name: Deploy security group stack
-        uses: aws-actions/aws-cloudformation-github-deploy@master
-        with:
-          name: sg
-          template: templates/sg.yml
-          no-fail-on-empty-changeset: "1"
+        env:
+          STACK_NAME: sg
+        run: |
+          aws cloudformation deploy \
+            --stack-name ${STACK_NAME} \
+            --template-file ./templates/${STACK_NAME}.yml \
+            --no-fail-on-empty-changeset
